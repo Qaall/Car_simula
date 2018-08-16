@@ -50,7 +50,7 @@ print(proc)
 while proc.poll() is None:
     line = proc.stdout.readline()
     line = line.decode('utf-8').split()
-
+    print("received line start: ",line)
     #look if state is present in Qtable
     print("state &&: ",state)
     Qstate = QTable.index.isin([state]).any()
@@ -80,7 +80,7 @@ while proc.poll() is None:
                 angle = line[2]
                 dist  = line[3]
                 new_score = int(line[4])
-
+    print("score:",score)
     score_diff = new_score - score
     score = new_score
     new_state = (int(speed), int(angle), int(dist))
@@ -96,9 +96,9 @@ while proc.poll() is None:
     #assign new state to state
     state = str(new_state)
 
-    print(score_diff)
+    print("received line before keypress: ",line)
 
-
+    print("key choosen to press: ",choosen_act)
     keyb.press(choosen_act)
     keyb.release(choosen_act)
 

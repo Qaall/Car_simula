@@ -130,11 +130,11 @@ def gameLoop():
 
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_UP:
-					speed -= 1
-					speed = max(speed,-10)
-				if event.key == pygame.K_DOWN:
 					speed += 1
 					speed = min(speed,10)
+				if event.key == pygame.K_DOWN:
+					speed -= 1
+					speed = max(speed,-10)
 				if event.key == pygame.K_LEFT:
 					angle -= 1
 					angle = max(angle,-4)
@@ -146,8 +146,8 @@ def gameLoop():
 		vector_one.rotate_ip(angle)
 		vectorx_smooth = round(vector_one[0],1)
 		vectory_smooth = round(vector_one[1],1)
-		xpoint += vectorx_smooth*speed
-		ypoint += vectory_smooth*speed
+		xpoint += vectorx_smooth*-speed
+		ypoint += vectory_smooth*-speed
 		#print(vector_one,"--",vectorx_smooth,vectory_smooth,speed,"--",angle)
 		car = pygame.Rect(xpoint,ypoint,car_size,car_size)
 
@@ -174,9 +174,9 @@ def gameLoop():
 
 		#speed vector direction
 		if speed == 0:
-			speedv = 1
+			speedv = -1
 		else:
-			speedv = -speed/abs(speed)
+			speedv = speed/abs(speed)
 
 		#testline
 
