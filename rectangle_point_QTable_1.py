@@ -209,9 +209,9 @@ def gameLoop():
 ## score  ################################
 		game_score += score(speed,wall)
 		game_score = int(game_score)
-		sys.stdout.flush()
+		
 		print('cardata', speed, angle, wall, game_score)
-
+		sys.stdout.flush()
 		displ.blit(font.render(str(game_score), True, (blue)), (48, 24))
 		'''
 		intersection with multiple objects
@@ -222,7 +222,7 @@ def gameLoop():
 		'''
 
 		pygame.display.update()
-		clock.tick(5)
+		clock.tick(1)
 
 	pygame.quit()
 	quit()
