@@ -6,21 +6,27 @@ import pandas as pd
 
 #keyboard simulate
 keyb = Controller()
-actions = [Key.up,Key.down,Key.left,Key.right]
+actions = ['U','D','L','R']
 action_dict = {'U':Key.up,'D':Key.down,'L':Key.left,'R':Key.right}
 score = 0
 new_score = 0
 
+#initiate state parameters
+speed = 0
+angle = 0
+dist = 0
 state = (0,0,0)
+state = str(state)
 
 #QTable
 
-QTable = pd.DataFrame(collumns='state','U','D','R','L')
-
+QTable = pd.DataFrame(columns=['state','U','D','R','L'])
+#set state as index
+QTable = QTable.set_index('state')
 
 #Hyperparameters
 epsilon = 1.0
-min_epsilon - 0.05
+min_epsilon = 0.05
 epsilon_dim = 0.001
 '''
 add hyperparameters
@@ -36,7 +42,7 @@ add ml loop
 '''
 
 
-proc =  subprocess.Popen(['python','C:\ML_Python\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
+proc =  subprocess.Popen(['python','D:\Projects_MachineL\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
 print(proc)
 
 
@@ -45,8 +51,10 @@ while proc.poll() is None:
     line = proc.stdout.readline()
     line = line.decode('utf-8').split()
 
-    #look for state in Qtable
-    Qstate = QTable[QTable.state==state]
+    #look if state is present in Qtable
+    print("state &&: ",state)
+    Qstate = QTable.index.isin([state]).any()
+    print("czy znaleziono:  -- ",Qstate)
 
     #indicator if any action value for given state is empty
     #Qstate_action_null = Qstate.isnull().values.any()
@@ -54,16 +62,16 @@ while proc.poll() is None:
     rnd = random.random()
 
 
-    if Qstate.empty or rnd < epsilon:
+    if not Qstate or rnd < epsilon:
         #exploration
-        choosen_act = random.choice(actions)
-
+        action_symbol = random.choice(actions)
+        choosen_act = action_dict.get(action_symbol)
 
     else:
         #exploitation
         Qaction = Qstate.iloc[:,1:5].astype(float).idxmax(axis=1)
-        Qaction_value = Qaction.values[0]
-        choosen_act =  action_dict.get(Qaction_value)
+        action_symbol = Qaction.values[0]
+        choosen_act =  action_dict.get(action_symbol)
 
     # read output from car
     if line != []:
@@ -75,11 +83,18 @@ while proc.poll() is None:
 
     score_diff = new_score - score
     score = new_score
+    new_state = (int(speed), int(angle), int(dist))
+    current_Qstate = pd.Series({action_symbol:score_diff},name=state)
 
+    print("wybrana akcja + wynik:",current_Qstate)
+    # ADD new / APPEND existing row to QTable
+    if Qstate:
+        QTable.set_value(state,action_symbol,score_diff)
+    else:
+        QTable = QTable.append(current_Qstate)
 
-    '''
-    choose Qtable or random
-    '''
+    #assign new state to state
+    state = str(new_state)
 
     print(score_diff)
 
@@ -87,6 +102,7 @@ while proc.poll() is None:
     keyb.press(choosen_act)
     keyb.release(choosen_act)
 
+print(QTable)
 
 '''
 update/add reward for state and choosen action
