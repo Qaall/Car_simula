@@ -15,6 +15,7 @@ keyb = Controller()
 displ_width = 800
 displ_height = 600
 
+
 car_size = 10
 
 displ = pygame.display.set_mode((displ_width,displ_height))
@@ -44,6 +45,8 @@ font = pygame.font.Font(None, 30)
 #### generating Qtable
 
 QTable = np.zeros((1,1))
+
+
 
 
 
@@ -96,6 +99,17 @@ def score(speed, wall_dist):
 	return score
 ###########################################################
 
+
+#walls
+lw_start, lw_end = (0,0),(0,displ_height)
+tw_start, tw_end = (0,0),(displ_width,0)
+rw_start, rw_end = (displ_width,0),(displ_width,displ_height)
+dw_start, dw_end = (0,displ_height),(displ_width,displ_height)
+left_wall = line(lw_start,lw_end)
+top_wall = line(tw_start,tw_end)
+right_wall = line(rw_start,rw_end)
+down_wall = line(dw_start,dw_end)
+
 # Main Loop
 
 def gameLoop():
@@ -113,7 +127,9 @@ def gameLoop():
 	game_score = 0
 	wall  = 0
 
-## timer #############################################
+
+
+# timer #############################################
 	start_ticks=pygame.time.get_ticks() #starter tick
 ######################################################
 
@@ -199,7 +215,20 @@ def gameLoop():
 		if is_intersect(line_start,line_end,rect_1_start,rect_1_end):
 			intersect_p=(intersection(line_car,line_rect))
 			wall = dist(line_start,intersect_p)
-
+		elif is_intersect(line_start,line_end,lw_start,lw_end): #left wall
+			intersect_p=(intersection(line_car,left_wall))
+			wall = dist(line_start,intersect_p)
+		elif is_intersect(line_start,line_end,tw_start,tw_end): #top wall
+			intersect_p=(intersection(line_car,top_wall))
+			wall = dist(line_start,intersect_p)
+		elif is_intersect(line_start,line_end,rw_start,rw_end): #right wall
+			intersect_p=(intersection(line_car,right_wall))
+			wall = dist(line_start,intersect_p)
+		elif is_intersect(line_start,line_end,dw_start,dw_end): #down wall
+			intersect_p=(intersection(line_car,down_wall))
+			wall = dist(line_start,intersect_p)
+		else:
+			wall = 0
 		## elif intersect with 2nd object
 		## elif intersect with 3rd object
 		## ....
@@ -207,9 +236,10 @@ def gameLoop():
 ######################################################
 
 ## score  ################################
+		wall = round(wall, -1)
 		game_score += score(speed,wall)
 		game_score = int(game_score)
-		
+
 		print('cardata', speed, angle, wall, game_score)
 		sys.stdout.flush()
 		displ.blit(font.render(str(game_score), True, (blue)), (48, 24))
@@ -222,7 +252,7 @@ def gameLoop():
 		'''
 
 		pygame.display.update()
-		clock.tick(1)
+		clock.tick(10)
 
 	pygame.quit()
 	quit()

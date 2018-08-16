@@ -89,7 +89,7 @@ while proc.poll() is None:
             print("score:",score)
             score_diff = new_score - score
             score = new_score
-            new_state = (int(speed), int(angle), int(dist))
+            new_state = (int(speed), int(angle), dist)
 
             current_Qstate = pd.Series({old_action_symbol:score_diff},name=state)
 
