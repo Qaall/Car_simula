@@ -12,8 +12,8 @@ pygame.init()
 #keyboard simulate
 keyb = Controller()
 
-displ_width = 1280
-displ_height = 720
+displ_width = 800
+displ_height = 600
 
 car_size = 10
 
@@ -44,7 +44,6 @@ font = pygame.font.Font(None, 30)
 #### generating Qtable
 
 QTable = np.zeros((1,1))
-print(QTable)
 
 
 
@@ -211,7 +210,7 @@ def gameLoop():
 		game_score += score(speed,wall)
 		game_score = int(game_score)
 		sys.stdout.flush()
-		print(game_score)
+		print('cardata', speed, angle, wall, game_score)
 
 		displ.blit(font.render(str(game_score), True, (blue)), (48, 24))
 		'''
@@ -223,7 +222,7 @@ def gameLoop():
 		'''
 
 		pygame.display.update()
-		clock.tick(10)
+		clock.tick(5)
 
 	pygame.quit()
 	quit()
