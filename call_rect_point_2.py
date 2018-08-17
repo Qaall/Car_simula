@@ -114,7 +114,6 @@ while proc.poll() is None and episod_no <= episodes:
 
                 # add accumulative score distribution
                 score_distribution = sum(three for one,two,three in state_list)/backtrack
-                print(score_distribution)
                 v_score_diff += score_distribution
 
             # ADD new / APPEND existing row to QTable #####################################################
