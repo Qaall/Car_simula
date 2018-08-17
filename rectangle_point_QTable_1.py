@@ -24,6 +24,7 @@ white = (255,255,255)
 black = (0,0,0)
 blue = (24,150,224)
 green = (0,124,0)
+blue2 = (73,107,163)
 
 
 #objects
@@ -87,6 +88,17 @@ def sig(x):
 	return (x-60)/(4+abs(x-60))
 ############################################################
 
+## angle function #########################################
+
+def angl(p1,p2):
+	x1,y1 = p1[0], p1[1]
+	x2,y2 = p2[0], p2[1]
+
+	deltax = x2 - x1
+	deltay = y2 - y1
+	angle_rad = math.atan2(deltay,deltax)
+	angle_deg = angle_rad*180.0/math.pi
+	return angle_deg
 
 ## score function ########################################
 
@@ -124,6 +136,7 @@ def gameLoop():
 	vector_one = Vector2(0,1)
 	speed = 0
 	angle = 0
+	rangle = 0
 	game_score = 0
 	wall  = 0
 
@@ -217,23 +230,30 @@ def gameLoop():
 
 
 		#if tru then standad intersection
+		# + angle between lines
 		if is_intersect(line_start,line_end,rect_1_start,rect_1_end):
 			intersect_p=(intersection(line_car,line_rect))
 			wall = dist(line_start,intersect_p)
+			rangle = angl(line_start,intersect_p)
 		elif is_intersect(line_start,line_end,lw_start,lw_end): #left wall
 			intersect_p=(intersection(line_car,left_wall))
 			wall = dist(line_start,intersect_p)
+			rangle = angl(line_start,intersect_p)
 		elif is_intersect(line_start,line_end,tw_start,tw_end): #top wall
 			intersect_p=(intersection(line_car,top_wall))
 			wall = dist(line_start,intersect_p)
+			rangle = angl(line_start,intersect_p)
 		elif is_intersect(line_start,line_end,rw_start,rw_end): #right wall
 			intersect_p=(intersection(line_car,right_wall))
 			wall = dist(line_start,intersect_p)
+			rangle = angl(line_start,intersect_p)
 		elif is_intersect(line_start,line_end,dw_start,dw_end): #down wall
 			intersect_p=(intersection(line_car,down_wall))
 			wall = dist(line_start,intersect_p)
+			rangle = angl(line_start,intersect_p)
 		else:
 			wall = 0
+			rangle = 0
 		## elif intersect with 2nd object
 		## elif intersect with 3rd object
 		## ....
@@ -241,13 +261,19 @@ def gameLoop():
 ######################################################
 
 ## score  ################################
+		rangle = round(rangle,0)
 		wall = round(wall, -1)
 		game_score += score(speed,wall)
 		game_score = int(game_score)
 
-		print('cardata', speed, angle, wall, game_score)
+		print('cardata', speed, angle, wall, rangle, game_score)
 		sys.stdout.flush()
-		displ.blit(font.render(str(game_score), True, (blue)), (48, 24))
+		displ.blit(font.render(str(game_score), True, (blue)), (24, 24))
+		#displ speed and rotate
+		displ.blit(font.render('spd:'+str(speed), True, (blue2)), (12, 48))
+		displ.blit(font.render('rot:'+str(angle), True, (blue2)), (12, 72))
+		#displ angle
+		displ.blit(font.render('rot:'+str(rangle), True, (blue2)), (12, 96))
 		'''
 		intersection with multiple objects
 		'''

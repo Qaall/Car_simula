@@ -16,9 +16,10 @@ new_score = 0
 
 #initiate state parameters
 speed = 0
-angle = 0
+rotate = 0
 dist = 0
-state = (0,0,0)
+angle = 0
+state = (0,0,0,0)
 state = str(state)
 
 #QTable
@@ -82,15 +83,16 @@ while proc.poll() is None and episod_no <= episodes:
 
             # read output from car
             speed = line[1]
-            angle = line[2]
+            rotate = line[2]
             dist  = line[3]
-            new_score = int(line[4])
+            angle = line[4]
+            new_score = int(line[5])
 
 
 
             score_diff = new_score - score
             score = new_score
-            new_state = (int(speed), int(angle), dist)
+            new_state = (int(speed), int(rotate), dist, angle)
 
             current_Qstate = pd.Series({old_action_symbol:score_diff},name=state)
 
@@ -122,7 +124,6 @@ fqtable.write(str(QTable))
 fqtable.close()
 
 print('x end')
-print(QTable)
 
 
 '''
