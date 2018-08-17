@@ -175,10 +175,15 @@ def gameLoop():
 		#     print ("x collision")
 
 
-		if car.colliderect(rect_1) or seconds>120.0:
-			gameLoop()
+		if car.colliderect(rect_1) or xpoint < 0 or xpoint > displ_width or ypoint <0 or ypoint > displ_height:
+			game_score = 0
+			speed = 0
+			angle = 0
+			xpoint = displ_width/4
+			ypoint = displ_height/2
 
-		if xpoint < 0 or xpoint > displ_width or ypoint <0 or ypoint > displ_height:
+		if seconds>30.0:
+			print("endtime")
 			gameLoop()
 
 			# canvas draw

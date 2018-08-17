@@ -30,15 +30,17 @@ QTable = QTable.set_index('state')
 #Hyperparameters
 epsilon = 1.0
 min_epsilon = 0.05
-epsilon_dim = 0.001
+epsilon_dim = 0.01
+episod_no = 0
+episodes = 200
 '''
 add hyperparameters
 - learning rate
-- epsilon (exploration/exploitation)
-- epsilon diminish rate
-- no. of episodes
 '''
 
+#score file
+fscore = open('score.txt','w')
+fqtable = open('qTable.txt','w')
 
 '''
 add ml loop
@@ -49,17 +51,16 @@ proc =  subprocess.Popen(['python','D:\Projects_MachineL\Car_simula\\rectangle_p
 print(proc)
 
 
-
-while proc.poll() is None:
+while proc.poll() is None and episod_no <= episodes:
     line = proc.stdout.readline()
     line = line.decode('utf-8').split()
     if line != []:
         if line[0] == 'cardata':
-            print("\n---------------'\nreceived line start: ",line)
+
             #look if state is present in Qtable
-            print("state &&: ",state)
+
             Qstate = QTable.index.isin([state]).any()
-            print("czy znaleziono:  -- ",Qstate)
+
 
             #indicator if any action value for given state is empty
             #Qstate_action_null = Qstate.isnull().values.any()
@@ -74,8 +75,9 @@ while proc.poll() is None:
 
             else:
                 #exploitation
-                Qaction = Qstate.iloc[:,1:5].astype(float).idxmax(axis=1)
-                action_symbol = Qaction.values[0]
+                Qrow = QTable.loc[state]
+                Qaction = Qrow.idxmax(axis=1)
+                action_symbol = Qaction
                 choosen_act =  action_dict.get(action_symbol)
 
             # read output from car
@@ -86,14 +88,12 @@ while proc.poll() is None:
 
 
 
-            print("score:",score)
             score_diff = new_score - score
             score = new_score
             new_state = (int(speed), int(angle), dist)
 
             current_Qstate = pd.Series({old_action_symbol:score_diff},name=state)
 
-            print("wybrana akcja + wynik:",current_Qstate,"\n||||||||")
             # ADD new / APPEND existing row to QTable
             if old_action_symbol != None:
                 if Qstate:
@@ -104,13 +104,26 @@ while proc.poll() is None:
             #assign new state to state
             state = str(new_state)
             old_action_symbol = action_symbol
-            print("received line before keypress: ",line)
 
-            print("key choosen to press: ",choosen_act)
             keyb.press(choosen_act)
             keyb.release(choosen_act)
+        elif line[0] == 'endtime':
+            episodes += 1
 
+            if epsilon > min_epsilon:
+                epsilon  -= epsilon_dim
+            print("---> ---> SCORE: ",score)
+            print("-----epsilon: ",epsilon)
+
+            fscore.write(str(score) + '\n')
+
+fscore.close()
+fqtable.write(str(QTable))
+fqtable.close()
+
+print('x end')
 print(QTable)
+
 
 '''
 update/add reward for state and choosen action
