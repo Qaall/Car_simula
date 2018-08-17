@@ -16,9 +16,10 @@ new_score = 0
 
 #initiate state parameters
 speed = 0
-angle = 0
+rotate = 0
 dist = 0
-state = (0,0,0)
+angle = 0
+state = (0,0,0,0)
 state = str(state)
 
 #QTable
@@ -37,6 +38,10 @@ episodes = 200
 add hyperparameters
 - learning rate
 '''
+# backtrack - number of actions in past for which score is updated (chain of actions)
+backtrack = 3
+state_list = []
+
 
 #score file
 fscore = open('score.txt','w')
@@ -82,17 +87,22 @@ while proc.poll() is None and episod_no <= episodes:
 
             # read output from car
             speed = line[1]
-            angle = line[2]
+            rotate = line[2]
             dist  = line[3]
-            new_score = int(line[4])
+            angle = line[4]
+            new_score = int(line[5])
 
 
 
             score_diff = new_score - score
             score = new_score
-            new_state = (int(speed), int(angle), dist)
+            new_state = (int(speed), int(rotate), dist, angle)
 
             current_Qstate = pd.Series({old_action_symbol:score_diff},name=state)
+
+            # state queue score distribution (over backtrack no. of actions)
+            #backtrack.append(current_Qstate)
+            
 
             # ADD new / APPEND existing row to QTable
             if old_action_symbol != None:
@@ -122,7 +132,6 @@ fqtable.write(str(QTable))
 fqtable.close()
 
 print('x end')
-print(QTable)
 
 
 '''
