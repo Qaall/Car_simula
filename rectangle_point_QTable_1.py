@@ -261,7 +261,7 @@ def gameLoop():
 ######################################################
 
 ## score  ################################
-		rangle = round(rangle,0)
+		rangle = round(rangle,-1)
 		wall = round(wall, -1)
 		game_score += score(speed,wall)
 		game_score = int(game_score)
