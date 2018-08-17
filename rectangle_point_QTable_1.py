@@ -189,7 +189,7 @@ def gameLoop():
 
 
 		if car.colliderect(rect_1) or xpoint < 0 or xpoint > displ_width or ypoint <0 or ypoint > displ_height:
-			game_score = 0
+			game_score -= 99
 			speed = 0
 			angle = 0
 			xpoint = displ_width/4

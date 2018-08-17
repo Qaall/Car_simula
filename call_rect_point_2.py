@@ -62,10 +62,9 @@ while proc.poll() is None and episod_no <= episodes:
     if line != []:
         if line[0] == 'cardata':
 
+
             #look if state is present in Qtable
-
             Qstate = QTable.index.isin([state]).any()
-
 
             #indicator if any action value for given state is empty
             #Qstate_action_null = Qstate.isnull().values.any()
@@ -98,19 +97,38 @@ while proc.poll() is None and episod_no <= episodes:
             score = new_score
             new_state = (int(speed), int(rotate), dist, angle)
 
-            current_Qstate = pd.Series({old_action_symbol:score_diff},name=state)
+
 
             # state queue score distribution (over backtrack no. of actions)
             #backtrack.append(current_Qstate)
-            
+            saved_state = [state,old_action_symbol,score_diff]
 
-            # ADD new / APPEND existing row to QTable
-            if old_action_symbol != None:
-                if Qstate:
-                    QTable.set_value(state,old_action_symbol,score_diff)
-                else:
-                    QTable = QTable.append(current_Qstate)
+            state_list.append(saved_state)
 
+
+            if len(state_list) > backtrack:
+                v = state_list.pop(0)
+                v_state = v[0]
+                v_old_action_symbol = v[1]
+                v_score_diff = v[2]
+
+                # add accumulative score distribution
+                score_distribution = sum(three for one,two,three in state_list)/backtrack
+                print(score_distribution)
+                v_score_diff += score_distribution
+
+            # ADD new / APPEND existing row to QTable #####################################################
+                if v_old_action_symbol != None:                                                           #
+                    #look if state is present in Qtable                                                   #
+                    Qstate = QTable.index.isin([v_state]).any()
+
+                    if Qstate:
+                        QTable.at[v_state,v_old_action_symbol] = v_score_diff
+                    else:
+                        current_Qstate = pd.Series({v_old_action_symbol:v_score_diff},name=v_state)        #
+                        QTable = QTable.append(current_Qstate)                                             #
+                                                                                                           #
+            ################################################################################################
             #assign new state to state
             state = str(new_state)
             old_action_symbol = action_symbol
