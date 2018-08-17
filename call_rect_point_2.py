@@ -136,6 +136,8 @@ while proc.poll() is None and episod_no <= episodes:
             keyb.release(choosen_act)
         elif line[0] == 'endtime':
             episodes += 1
+            v_old_action_symbol = None
+            state_list = []
 
             if epsilon > min_epsilon:
                 epsilon  -= epsilon_dim
