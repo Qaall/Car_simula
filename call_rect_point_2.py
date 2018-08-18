@@ -23,8 +23,8 @@ state = (0,0,0,0)
 state = str(state)
 
 #QTable
-
 QTable = pd.DataFrame(columns=['state','U','D','R','L'])
+
 #set state as index
 QTable = QTable.set_index('state')
 
@@ -52,7 +52,7 @@ add ml loop
 '''
 
 
-proc =  subprocess.Popen(['python','C:\ML_Python\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
+proc =  subprocess.Popen(['python','D:\Projects_MachineL\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
 print(proc)
 
 
@@ -105,7 +105,9 @@ while proc.poll() is None and episod_no <= episodes:
 
             state_list.append(saved_state)
 
-
+            '''
+            change to functions
+            '''
             if len(state_list) > backtrack:
                 v = state_list.pop(0)
                 v_state = v[0]
@@ -124,24 +126,60 @@ while proc.poll() is None and episod_no <= episodes:
                     if Qstate:
                         QTable.at[v_state,v_old_action_symbol] = v_score_diff
                     else:
-                        current_Qstate = pd.Series({v_old_action_symbol:v_score_diff},name=v_state)        #
-                        QTable = QTable.append(current_Qstate)                                             #
+                        addQTable = pd.DataFrame(columns=['state','U','D','R','L'])
+                        addQTable = addQTable.set_index('state')
+
+                        current_Qstate = pd.Series({v_old_action_symbol:v_score_diff},name=v_state)
+                        addQTable = addQTable.append(current_Qstate)
+                        addQTable= addQTable.fillna(0)
+                        QTable = pd.concat([QTable,addQTable])                                             #
                                                                                                            #
             ################################################################################################
+
             #assign new state to state
             state = str(new_state)
             old_action_symbol = action_symbol
 
             keyb.press(choosen_act)
             keyb.release(choosen_act)
+
+        elif line[0] == 'crash':
+            while len(state_list) > 0:
+                v = state_list.pop(0)
+                v_state = v[0]
+                v_old_action_symbol = v[1]
+                v_score_diff = v[2]
+
+                # add accumulative score distribution
+                score_distribution = sum(three for one,two,three in state_list)/backtrack
+                v_score_diff += score_distribution
+
+            # ADD new / APPEND existing row to QTable #####################################################
+                if v_old_action_symbol != None:                                                           #
+                    #look if state is present in Qtable                                                   #
+                    Qstate = QTable.index.isin([v_state]).any()
+
+                    if Qstate:
+                        QTable.at[v_state,v_old_action_symbol] = v_score_diff
+                    else:
+                        addQTable = pd.DataFrame(columns=['state','U','D','R','L'])
+                        addQTable = addQTable.set_index('state')
+
+                        current_Qstate = pd.Series({v_old_action_symbol:v_score_diff},name=v_state)
+                        addQTable = addQTable.append(current_Qstate)
+                        addQTable= addQTable.fillna(0)
+                        QTable = pd.concat([QTable,addQTable])                                             #
+                                                                                                           #
+            ################################################################################################
+
         elif line[0] == 'endtime':
-<<<<<<< HEAD
+
             episod_no += 1
-=======
-            episodes += 1
+
+
+
             v_old_action_symbol = None
             state_list = []
->>>>>>> 1f7a38acc64b8d8a21f5de32dc69a72770ac81f2
 
             if epsilon > min_epsilon:
                 epsilon  -= epsilon_dim
