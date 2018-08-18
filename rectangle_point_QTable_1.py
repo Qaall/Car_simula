@@ -38,7 +38,7 @@ pygame.display.set_caption('test_title')
 
 
 clock = pygame.time.Clock()
-gametime = 120.0
+gametime = 30.0
 
 font = pygame.font.Font(None, 30)
 

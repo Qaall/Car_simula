@@ -31,15 +31,15 @@ QTable = QTable.set_index('state')
 #Hyperparameters
 epsilon = 1.0
 min_epsilon = 0.05
-epsilon_dim = 0.01
+epsilon_dim = 0.005
 episod_no = 0
-episodes = 200
+episodes = 240
 '''
 add hyperparameters
 - learning rate
 '''
 # backtrack - number of actions in past for which score is updated (chain of actions)
-backtrack = 3
+backtrack = 6
 state_list = []
 
 
@@ -135,13 +135,7 @@ while proc.poll() is None and episod_no <= episodes:
             keyb.press(choosen_act)
             keyb.release(choosen_act)
         elif line[0] == 'endtime':
-<<<<<<< HEAD
             episod_no += 1
-=======
-            episodes += 1
-            v_old_action_symbol = None
-            state_list = []
->>>>>>> 1f7a38acc64b8d8a21f5de32dc69a72770ac81f2
 
             if epsilon > min_epsilon:
                 epsilon  -= epsilon_dim
@@ -151,7 +145,7 @@ while proc.poll() is None and episod_no <= episodes:
             fscore.write(str(score) + '\n')
 
 fscore.close()
-fqtable.write(str(QTable))
+fqtable.write(QTable.to_string())
 fqtable.close()
 
 print('x end')
