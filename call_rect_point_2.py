@@ -52,7 +52,7 @@ add ml loop
 '''
 
 
-proc =  subprocess.Popen(['python','D:\Projects_MachineL\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
+proc =  subprocess.Popen(['python','C:\ML_Python\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
 print(proc)
 
 
@@ -135,9 +135,13 @@ while proc.poll() is None and episod_no <= episodes:
             keyb.press(choosen_act)
             keyb.release(choosen_act)
         elif line[0] == 'endtime':
+<<<<<<< HEAD
+            episod_no += 1
+=======
             episodes += 1
             v_old_action_symbol = None
             state_list = []
+>>>>>>> 1f7a38acc64b8d8a21f5de32dc69a72770ac81f2
 
             if epsilon > min_epsilon:
                 epsilon  -= epsilon_dim
