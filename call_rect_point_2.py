@@ -31,15 +31,15 @@ QTable = QTable.set_index('state')
 #Hyperparameters
 epsilon = 1.0
 min_epsilon = 0.05
-epsilon_dim = 0.01
+epsilon_dim = 0.002
 episod_no = 0
-episodes = 200
+episodes = 800
 '''
 add hyperparameters
 - learning rate
 '''
 # backtrack - number of actions in past for which score is updated (chain of actions)
-backtrack = 3
+backtrack = 8
 state_list = []
 
 
@@ -52,7 +52,7 @@ add ml loop
 '''
 
 
-proc =  subprocess.Popen(['python','D:\Projects_MachineL\Car_simula\\rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
+proc =  subprocess.Popen(['python','rectangle_point_QTable_1.py'],shell=True, stdout=subprocess.PIPE)
 print(proc)
 
 
@@ -189,7 +189,7 @@ while proc.poll() is None and episod_no <= episodes:
             fscore.write(str(score) + '\n')
 
 fscore.close()
-fqtable.write(str(QTable))
+fqtable.write(QTable.to_string())
 fqtable.close()
 
 print('x end')
