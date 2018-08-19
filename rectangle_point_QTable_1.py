@@ -205,7 +205,7 @@ def gameLoop():
 
 
 		if car.colliderect(rect_1) or xpoint < 0 or xpoint > displ_width or ypoint <0 or ypoint > displ_height:
-			game_score -= 99
+			game_score -= 180
 			speed = 0
 			rot = 0
 			xpoint = displ_width/4
@@ -305,7 +305,7 @@ def gameLoop():
 		'''
 
 		pygame.display.update()
-		clock.tick(10)
+		clock.tick(30)
 
 	pygame.quit()
 	quit()
