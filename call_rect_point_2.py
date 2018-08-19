@@ -34,6 +34,7 @@ min_epsilon = 0.05
 epsilon_dim = 0.002
 episod_no = 0
 episodes = 800
+learning_rate = 0.1
 '''
 add hyperparameters
 - learning rate
@@ -66,21 +67,30 @@ while proc.poll() is None and episod_no <= episodes:
             #look if state is present in Qtable
             Qstate = QTable.index.isin([state]).any()
 
-            #indicator if any action value for given state is empty
-            #Qstate_action_null = Qstate.isnull().values.any()
-
+            #random for exploration rate
             rnd = random.random()
 
-
-            if not Qstate or rnd < epsilon:
+            # if new state is not in a table yet  -> run exploration
+            if not Qstate:
                 #exploration
                 action_symbol = random.choice(actions)
                 choosen_act = action_dict.get(action_symbol)
+                Qvalue = 0
 
+            elif rnd < epsilon:
+            # if random grater than current exploration rate -> run exploration
+                action_symbol = random.choice(actions)
+                choosen_act = action_dict.get(action_symbol)
+                # and re
+                Qrow = QTable.loc[state]
+                Qvalue = Qrow[action_symbol]
+            # otherwise run exploitation and retrieve action (move to be taken) with highest predicted value
             else:
                 #exploitation
                 Qrow = QTable.loc[state]
                 Qaction = Qrow.idxmax(axis=1)
+                Qvalue = Qrow.max()
+
                 action_symbol = Qaction
                 choosen_act =  action_dict.get(action_symbol)
 
@@ -92,16 +102,21 @@ while proc.poll() is None and episod_no <= episodes:
             new_score = int(line[5])
 
 
-
+            # value assigned for given action is a difference between
+            # cumalative score before action is taken and cumulative score afterwards
             score_diff = new_score - score
+
+            #new score is assigned to be used in next loop as old score value
             score = new_score
+
+
+            #Bellman equation
+            new_val = Qvalue + learning_rate*(score_diff - Qvalue)
+
+
+            # state queue & score distribution (over no. of actions represented by 'backtrack' variable)
             new_state = (int(speed), int(rotate), dist, angle)
-
-
-
-            # state queue score distribution (over backtrack no. of actions)
-            #backtrack.append(current_Qstate)
-            saved_state = [state,old_action_symbol,score_diff]
+            saved_state = [state,old_action_symbol,new_val]
 
             state_list.append(saved_state)
 
