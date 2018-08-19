@@ -15,7 +15,6 @@ keyb = Controller()
 displ_width = 800
 displ_height = 600
 
-
 car_size = 10
 
 displ = pygame.display.set_mode((displ_width,displ_height))
@@ -210,6 +209,7 @@ def gameLoop():
 			rot = 0
 			xpoint = displ_width/4
 			ypoint = displ_height/2
+			print("crash")
 
 		if seconds>gametime:
 			print("endtime")
