@@ -13,6 +13,7 @@ action_dict = {'U':Key.up,'D':Key.down,'L':Key.left,'R':Key.right}
 old_action_symbol = None
 score = 0
 new_score = 0
+Qvalue = 0.0
 
 #initiate state parameters
 speed = 0
@@ -31,9 +32,9 @@ QTable = QTable.set_index('state')
 #Hyperparameters
 epsilon = 1.0
 min_epsilon = 0.05
-epsilon_dim = 0.002
+epsilon_dim = 0.004
 episod_no = 0
-episodes = 800
+episodes = 400
 learning_rate = 0.1
 '''
 add hyperparameters
@@ -48,6 +49,7 @@ state_list = []
 fscore = open('score.txt','w')
 fqtable = open('qTable.txt','w')
 
+#ferr = open('err.txt','w')
 '''
 add ml loop
 '''
@@ -110,13 +112,14 @@ while proc.poll() is None and episod_no <= episodes:
             score = new_score
 
 
-            #Bellman equation
-            new_val = Qvalue + learning_rate*(score_diff - Qvalue)
 
+            #ferr.write(str(Qvalue) +' '+ str(score_diff) + '\n')
+
+            #ferr.write("new_v:"+str(new_val) + '\n')
 
             # state queue & score distribution (over no. of actions represented by 'backtrack' variable)
             new_state = (int(speed), int(rotate), dist, angle)
-            saved_state = [state,old_action_symbol,new_val]
+            saved_state = [state,old_action_symbol,score_diff]
 
             state_list.append(saved_state)
 
@@ -130,8 +133,14 @@ while proc.poll() is None and episod_no <= episodes:
                 v_score_diff = v[2]
 
                 # add accumulative score distribution
+
+
                 score_distribution = sum(three for one,two,three in state_list)/backtrack
+
                 v_score_diff += score_distribution
+
+                #Bellman equation
+                new_val = Qvalue + learning_rate*(v_score_diff - Qvalue)
 
             # ADD new / APPEND existing row to QTable #####################################################
                 if v_old_action_symbol != None:                                                           #
@@ -139,12 +148,12 @@ while proc.poll() is None and episod_no <= episodes:
                     Qstate = QTable.index.isin([v_state]).any()
 
                     if Qstate:
-                        QTable.at[v_state,v_old_action_symbol] = v_score_diff
+                        QTable.at[v_state,v_old_action_symbol] = new_val
                     else:
                         addQTable = pd.DataFrame(columns=['state','U','D','R','L'])
                         addQTable = addQTable.set_index('state')
 
-                        current_Qstate = pd.Series({v_old_action_symbol:v_score_diff},name=v_state)
+                        current_Qstate = pd.Series({v_old_action_symbol:new_val},name=v_state)
                         addQTable = addQTable.append(current_Qstate)
                         addQTable= addQTable.fillna(0)
                         QTable = pd.concat([QTable,addQTable])                                             #
@@ -169,18 +178,20 @@ while proc.poll() is None and episod_no <= episodes:
                 score_distribution = sum(three for one,two,three in state_list)/backtrack
                 v_score_diff += score_distribution
 
+                #Bellman equation
+                new_val = Qvalue + learning_rate*(v_score_diff - Qvalue)
             # ADD new / APPEND existing row to QTable #####################################################
                 if v_old_action_symbol != None:                                                           #
                     #look if state is present in Qtable                                                   #
                     Qstate = QTable.index.isin([v_state]).any()
 
                     if Qstate:
-                        QTable.at[v_state,v_old_action_symbol] = v_score_diff
+                        QTable.at[v_state,v_old_action_symbol] = new_val
                     else:
                         addQTable = pd.DataFrame(columns=['state','U','D','R','L'])
                         addQTable = addQTable.set_index('state')
 
-                        current_Qstate = pd.Series({v_old_action_symbol:v_score_diff},name=v_state)
+                        current_Qstate = pd.Series({v_old_action_symbol:new_val},name=v_state)
                         addQTable = addQTable.append(current_Qstate)
                         addQTable= addQTable.fillna(0)
                         QTable = pd.concat([QTable,addQTable])                                             #
@@ -210,20 +221,7 @@ fqtable.close()
 print('x end')
 
 
-'''
-update/add reward for state and choosen action
-'''
-
 
 '''
-append state if not exists
-'''
-
-'''
-add points loss on crash
-'''
-
-'''
-v2.0
-- introduce series of states
+cleanup the code
 '''

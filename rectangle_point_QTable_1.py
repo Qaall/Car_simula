@@ -305,7 +305,7 @@ def gameLoop():
 		'''
 
 		pygame.display.update()
-		clock.tick(30)
+		clock.tick(60)
 
 	pygame.quit()
 	quit()
