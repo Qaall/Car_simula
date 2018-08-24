@@ -25,16 +25,23 @@ state = str(state)
 
 #QTable
 QTable = pd.DataFrame(columns=['state','U','D','R','L'])
-
 #set state as index
 QTable = QTable.set_index('state')
+
+#pickle
+pickle_nm = 'QTable2.pkl'
+
+try:
+    QTable = pd.read_pickle(pickle_nm)
+except IOError:
+    print('pickle:',pickle_nm,' not found, creating new one')
 
 #Hyperparameters
 epsilon = 1.0
 min_epsilon = 0.05
-epsilon_dim = 0.004
+epsilon_dim = 0.001
 episod_no = 0
-episodes = 400
+episodes = 1200
 learning_rate = 0.1
 '''
 add hyperparameters
@@ -66,7 +73,7 @@ while proc.poll() is None and episod_no <= episodes:
         if line[0] == 'cardata':
 
 
-            #look if state is present in Qtable
+            #look if state is present in QTable
             Qstate = QTable.index.isin([state]).any()
 
             #random for exploration rate
@@ -135,7 +142,10 @@ while proc.poll() is None and episod_no <= episodes:
                 # add accumulative score distribution
 
 
-                score_distribution = sum(three for one,two,three in state_list)/backtrack
+                #score_distribution = sum(three for one,two,three in state_list)/backtrack
+                score_distribution = 0
+                for i in range(backtrack):
+                    score_distribution += state_list[i][2]/(i+2)
 
                 v_score_diff += score_distribution
 
@@ -144,7 +154,7 @@ while proc.poll() is None and episod_no <= episodes:
 
             # ADD new / APPEND existing row to QTable #####################################################
                 if v_old_action_symbol != None:                                                           #
-                    #look if state is present in Qtable                                                   #
+                    #look if state is present in QTable                                                   #
                     Qstate = QTable.index.isin([v_state]).any()
 
                     if Qstate:
@@ -182,7 +192,7 @@ while proc.poll() is None and episod_no <= episodes:
                 new_val = Qvalue + learning_rate*(v_score_diff - Qvalue)
             # ADD new / APPEND existing row to QTable #####################################################
                 if v_old_action_symbol != None:                                                           #
-                    #look if state is present in Qtable                                                   #
+                    #look if state is present in QTable                                                   #
                     Qstate = QTable.index.isin([v_state]).any()
 
                     if Qstate:
@@ -195,7 +205,7 @@ while proc.poll() is None and episod_no <= episodes:
                         addQTable = addQTable.append(current_Qstate)
                         addQTable= addQTable.fillna(0)
                         QTable = pd.concat([QTable,addQTable])                                             #
-                                                                                                           #
+                                                                                                          #
             ################################################################################################
 
         elif line[0] == 'endtime':
@@ -218,6 +228,9 @@ fscore.close()
 fqtable.write(QTable.to_string())
 fqtable.close()
 
+QTable.to_pickle(pickle_nm)
+
+proc.kill()
 print('x end')
 
 
